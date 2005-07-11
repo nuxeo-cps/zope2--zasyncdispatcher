@@ -19,8 +19,35 @@
 # $Id$
 """ asynchronous load balancer over zasync
 """
+from Acquisition import aq_get
 from AccessControl.Permissions import view_management_screens
+
 import zasyncdispatcher
+
+# extracted from cmf
+_marker = object()
+def _getToolByName(obj, name, default=_marker):
+    try:
+        tool = aq_get(obj, name, default, 1)
+    except AttributeError:
+        if default is _marker:
+            raise
+        return default
+    else:
+        if tool is _marker:
+            raise AttributeError, name
+        return tool
+
+def asyncedCall(context, call):
+    """ send an asynced call within a CMF portal
+
+    returns None,None in case of failure, ie asynced not installed
+    """
+    dispatcher = _getToolByName(context, 'asynchronous_call_dispatcher', None)
+    if dispatcher is not None:
+        return dispatcher.putCall('zope_exec', '/', {}, call, {})
+    else:
+        return None, None
 
 def initialize(context):
     """Zope product setup"""

@@ -24,6 +24,7 @@ from Testing.ZopeTestCase import ZopeTestCase
 
 from Products.zasyncdispatcher.zasyncdispatcher import ZAsyncDispatcher
 from Products.zasync.manager import constructAsynchronousCallManager
+from Products.zasyncdispatcher import asyncedCall
 
 installProduct('zasync')
 
@@ -32,6 +33,9 @@ class FakeBIM:
         return 'ok'
 
 class ZAsyncDispatcherTestCase(ZopeTestCase):
+
+    def test_asyncedCall(self):
+        asyncedCall(self, 'python:1')
 
     def test_instance(self):
         dispatcher = ZAsyncDispatcher()
