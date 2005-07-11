@@ -1,0 +1,59 @@
+<h1 tal:replace="structure here/manage_page_header" />
+<h2 tal:replace="structure python: here.manage_form_title(
+  form_title='Add Asynchronous Call Manager')" />
+
+<p class="form-help">
+Create an asynchronous call manager.  Requires zasync to poll the manager across
+ZEO to do anything useful.  Typically you only need one of these for your whole
+Zope, installed in the root of your site, and the id listed below is the default
+for which zasync looks.
+</p>
+
+<form action="constructAsynchronousCallManager" method="POST">
+<table cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+      Id
+    </div>
+    </td>
+    <td align="left" valign="top" class="form-label">
+    <input type="text" name="id" size="40" value="asynchronous_call_manager" />
+    <p tal:condition="here/asynchronous_call_manager|nothing" style="color:red">
+    You appear to already have an asynchronous_call_manager installed.</p>
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+      Seconds between zasync polling (anything below 2 seconds will normalize to 2 seconds)
+    </div>
+    </td>
+    <td align="left" valign="top" class="form-label">
+    <input type="text" name="poll_interval:int" size="4" value="5" />
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    <div class="form-label">
+      Period of cache rotation for resolved deferreds in seconds (defaults to one day)
+    </div>
+    </td>
+    <td align="left" valign="top" class="form-label">
+    <input type="text" name="rotation_period:int" size="10" value="86400" />
+    </td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+    </td>
+    <td align="left" valign="top">
+    <div class="form-element">
+    <input class="form-element" type="submit" name="submit"
+     value=" Create " />
+    </div>
+    </td>
+  </tr>
+</table>
+</form>
+
+<h1 tal:replace="structure here/manage_page_footer" />
