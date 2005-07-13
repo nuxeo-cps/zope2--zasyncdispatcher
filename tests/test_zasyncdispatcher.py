@@ -24,7 +24,7 @@ from Testing.ZopeTestCase import ZopeTestCase
 
 from Products.zasyncdispatcher.zasyncdispatcher import ZAsyncDispatcher
 from Products.zasync.manager import constructAsynchronousCallManager
-from Products.zasyncdispatcher import asyncedCall
+from Products.zasyncdispatcher import asyncedCall, canAsync
 
 installProduct('zasync')
 
@@ -36,6 +36,9 @@ class ZAsyncDispatcherTestCase(ZopeTestCase):
 
     def test_asyncedCall(self):
         asyncedCall(self, 'python:1')
+
+    def test_asyncedCall(self):
+        self.assertEquals(canAsync(self), False)
 
     def test_instance(self):
         dispatcher = ZAsyncDispatcher()

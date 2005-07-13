@@ -49,6 +49,11 @@ def asyncedCall(context, call):
     else:
         return None, None
 
+def canAsync(context):
+    """ tells if async works """
+    dispatcher = _getToolByName(context, 'asynchronous_call_dispatcher', None)
+    return dispatcher is not None
+
 def initialize(context):
     """Zope product setup"""
     context.registerClass(
