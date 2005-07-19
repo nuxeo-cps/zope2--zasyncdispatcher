@@ -18,15 +18,32 @@
 # 02111-1307, USA.
 import unittest
 import os
+import time, datetime
 from zope.testing import doctest
 from Testing.ZopeTestCase import installProduct
 from Testing.ZopeTestCase import ZopeTestCase
 
-from Products.zasyncdispatcher.zasyncdispatcher import ZAsyncDispatcher
-from Products.zasync.manager import constructAsynchronousCallManager
+from Products.zasyncdispatcher.zasyncdispatcher import ZAsyncDispatcher,\
+                                                       _custom_delta
+from Products.zasync.manager import AsynchronousCallManager
 from Products.zasyncdispatcher import asyncedCall, canAsync
 
 installProduct('zasync')
+
+class AsynchronousFakePing(AsynchronousCallManager):
+    def ping(self):
+        """make a ping request to the zasync client to see if it replies
+        in the heartbeat method."""
+        self._last_ping = datetime.datetime.now()
+        self._last_pong = self._last_ping + \
+                    datetime.timedelta(seconds=self.rotation_period)
+
+def constructAsynchronousCallManager(dispatcher,
+                                     id="asynchronous_call_manager"):
+    """Construct an AsynchronousCallManager"""
+    acm = AsynchronousFakePing(id)
+    container = dispatcher.this()
+    container._setObject(id, acm)
 
 class FakeBIM:
     def getBrowserId(self):
@@ -74,6 +91,16 @@ class ZAsyncDispatcherTestCase(ZopeTestCase):
         # there's no plugins)
 
         self.assertRaises(ValueError, dispatcher.putSessionCall, 'ok')
+
+    def test__custom_delta(self):
+        now = datetime.datetime.now()
+        time.sleep(1)
+        now2 = datetime.datetime.now()
+        delta = _custom_delta(now2, now)
+        self.assertEquals(delta, 1)
+
+        delta = _custom_delta(now, now2)
+        self.assertEquals(delta, 1)
 
 def test_suite():
     return unittest.TestSuite((
