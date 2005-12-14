@@ -98,20 +98,35 @@ class ZAsyncDispatcher(Folder):
                 best_choice = manager
         return best_choice
 
+    security.declarePrivate('_directCall')
+    def _directCall(self, _plugin, *args, **kwargs):
+        """ XXX a direct call has to be made here
+        with the given arguments
+        """
+        raise NotImplementedError
+
     #
     # load-balanced APIs
     #
     security.declareProtected(MakeAsynchronousApplicationCalls, 'putCall')
     def putCall(self, _plugin, *args, **kwargs):
         ob = self._retrieveBestAsyncManager()
-        result = ob._putCall(None, _plugin, *args, **kwargs)
-        return ob.id, result
+        if ob is None:
+            # no live client, making a direct call
+            return self._directCall(_plugin, *args, **kwargs)
+        else:
+            result = ob._putCall(None, _plugin, *args, **kwargs)
+            return ob.id, result
 
     security.declareProtected(MakeAsynchronousSessionCalls, 'putSessionCall')
     def putSessionCall(self, _plugin, *args, **kwargs):
         ob = self._retrieveBestAsyncManager()
-        result = ob._putCall((ob._getBrowserId(),), _plugin, *args, **kwargs)
-        return ob.id, result
+        if ob is None:
+            # no live client, making a direct call
+            return self._directCall(_plugin, *args, **kwargs)
+        else:
+            result = ob._putCall((ob._getBrowserId(),), _plugin, *args, **kwargs)
+            return ob.id, result
 
 constructZAsyncDispatcherForm = PageTemplateFile(
     'www/constructZAsyncDispatcherForm.zpt', globals(),
